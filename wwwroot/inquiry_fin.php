@@ -1,5 +1,8 @@
 <?php
   //inquiry_fin.php
+  //
+  ob_start();
+  session_start();
 
   //入力された情報を取得
   //var_dump($_POST);　//postの中に情報が格納されている
@@ -40,8 +43,14 @@
   }
   //error判定
     if (array() != $error_detail) {
-        //
-    echo 'error';
+        //エラー内容をセッションに保持する
+        $_SESSION['buffer']['error_detail'] = $error_detail;
+        //入力情報をセッションに保持する
+        $_SESSION['buffer']['input'] = $input_data;
+  //var_dump($error_detail);
+        //echo 'error';
+        //入力ページに突きかえす
+    header('Location: ./inquiry.php');
         exit();
     }
   //ダミー
