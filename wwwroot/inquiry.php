@@ -23,6 +23,19 @@
     $error_detail = array();
   }
 
+  //csrfトークンを作成
+  //php7前提
+  $csrf_token = hash('sha512', random_bytes(128));
+  var_dump($csrf_token);
+
+  //csrfトークンは５個まで（あとで追加するので、ここで）
+  while (10 <= count(@$_SESSION['csrf_token'])) {
+      array_shift($_SESSION['csrf_token']);
+  }
+
+  //csrfトークンをSESSIONに入れておく時間付き
+  $_SESSION['csrf_token'][$csrf_token] = time();
+
   //xss対策関数
   function h($s){
     return htmlspecialchars($s,ENT_QUOTES);
@@ -53,7 +66,8 @@
        Name      : <input type="text" name="name" value="<?php echo h((string)@$input['name']);?>"><br>
        Birthday  : <input type="text" name="birthday" value="<?php echo h((string)@$input['birthday']);?>"><br>
        Comment   : <textarea name="body" rows="8" cols="80"><<?php echo h((string)@$input['textarea']);?>/textarea><br>
-       <button type="submit" name="button">Contact</button>
+      <input type="hidden" name="csrf_token" value="<?php echo h($csrf_token);?>">
+      <button type="submit" name="button">Contact</button>
      </form>
    </body>
  </html>

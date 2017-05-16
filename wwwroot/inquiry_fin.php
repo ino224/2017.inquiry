@@ -14,7 +14,7 @@
     foreach ($params as $p) {
         $input_data[$p] = (string) @$_POST[$p]; //空文字対策
     }
-    var_dump($input_data);
+    //var_dump($input_data);
 
   //Validation(情報は正しいか)
     $error_detail = array();//error情報格納用変数
@@ -26,6 +26,25 @@
         $error_detail["error_must_{$p}"] = true;
         }
     }
+
+    //CSRFチェック
+    //tokenの存在確認
+    $posted_token = $_POST['csrf_token'];
+    if(false === isset($_SESSION['csrf_token'][$posted_token])){
+      //
+      $error_detail['error_csrf_token'] = true;
+    }else {
+      //tokenの寿命確認
+      if(time() >= $ttl + 60){
+        $error_detail['error_csrf_timeover'] = true;
+      }
+      //いずれにしてもtokenは一回しか使えないので
+      unset($_SESSION['csrf_token']['$posted_token']);
+    }
+
+    //tokenの寿命確認
+
+
 
     //型チェック　email
     // xxx RFC非準拠のメアドは知らん！！
