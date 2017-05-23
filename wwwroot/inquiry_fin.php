@@ -4,6 +4,10 @@
   ob_start();
   session_start();
 
+  //
+  require_once(__DIR__.'/dbh.php');
+  //var_dump(__DIR__.'/dbh.php')
+
   //入力された情報を取得
   //var_dump($_POST);　//postの中に情報が格納されている
   //$email = $_POST['email'];
@@ -35,6 +39,7 @@
       $error_detail['error_csrf_token'] = true;
     }else {
       //tokenの寿命確認
+      $ttl = $_SESSION['csrf_token'][$posted_token];
       if(time() >= $ttl + 60){
         $error_detail['error_csrf_timeover'] = true;
       }
@@ -77,4 +82,25 @@
 
   //DBにinsert
 
+  //DBハンドルを取得
+  $dbh = get_dbh();
+  //var_dump($dbh);
+
+  //SQL文を作成
+  $sql = 'INSERT INTO inquirys(email, inquiry_body, name, birthday) VALUES(:email, :inquiry_body, :name, :birthday);';
+  $pre = $dbh->prepare($sql);
+  var_dump($pre);
+  //プレースホルダーにデータをバインド
+  $pre->bindValue(':email', $input_data['email']);
+  $pre->bindValue(':inquiry_body', $input_data['body']);
+  $pre->bindValue(':birthday', $input_data['birthday']);
+  $pre->bindValue(':name', $input_data['name']);
+  //SQL実行
+  $r = $pre->execute();
+  var_dump($r);
+  if(false === $r){
+    //
+    echo 'すみませんデータが取得できません';
+    exit;
+  }
   //[Thank you for Contact] pageの出力

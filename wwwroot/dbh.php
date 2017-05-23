@@ -3,6 +3,12 @@
 require_once('db_config.php');
 // ----------------------------
 function get_dbh() {
+  //二重接続を防ぐためのロジック
+  static $dbh = NULL;
+  if(NULL !== $dbh){
+    return $dbh;
+  }
+  
   //設定値の取得
   $db_config = db_config();
   // データの設定
